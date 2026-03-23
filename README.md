@@ -1,69 +1,67 @@
-# 🌍 EcoGuard: India Intelligence Map
+# 🌍 EcoGuard: India Intelligence Map 
+
 
 ## 📌 Project Overview
-EcoGuard is an interactive web application built using R Shiny that visualizes geographical intelligence across India. It allows users to click on any location and analyze Pollution (AQI) and Crime Density.
+EcoGuard is an interactive spatial intelligence web application built using **R Shiny**. It provides a high-level dashboard for geographical risk analysis across India. Unlike static maps, EcoGuard allows users to click any coordinate on the map to trigger a real-time "Intelligence Probe," analyzing **Pollution (AQI)** and **Crime Density** for that specific location.
 
-The system combines maps, API data, and visualization to provide a simple spatial intelligence dashboard.
+The system fuses interactive mapping, live API geocoding, and reactive data visualization into a single, seamless user experience.
 
 ---
 
 ## 🎯 Objectives
-- Build an interactive map-based application  
-- Visualize location-based data dynamically  
-- Use APIs to fetch real location names  
-- Simulate AQI and crime-related insights  
-- Create a user-friendly dashboard  
+- **Interactive Spatial Querying:** Enable users to probe any point in India via map clicks.
+- **Live Geocoding:** Fetch real-time location names (City/Town/District) using external APIs.
+- **Risk Visualization:** Dynamically generate AQI and Crime insights based on geographical coordinates.
+- **Dual-State UI:** Provide a professional interface with instant Light/Dark mode switching.
+- **Actionable Analytics:** Use ggplot2 to provide instant visual breakdowns of local risks.
 
 ---
 
 ## 🛠️ Technologies Used
-- R Programming Language  
-- Shiny  
-- Leaflet  
-- bslib  
-- ggplot2  
-- httr  
-- tidyverse  
+- **Core Language:** R
+- **Web Framework:** `Shiny` (UI & Server)
+- **Spatial Mapping:** `Leaflet` (Provider Tiles: CartoDB DarkMatter & Positron)
+- **UI/UX Enhancement:** `bslib` (Bootstrap 5), `shinyWidgets` (Custom Toggles/Buttons)
+- **Data Visuals:** `ggplot2`
+- **API Communication:** `httr` & `jsonlite` (Nominatim OpenStreetMap API)
+- **Data Manipulation:** `tidyverse`
 
 ---
 
 ## ⚙️ Features
 
-### 🗺️ Interactive Map
-- Click anywhere on the map  
-- Displays location name using reverse geocoding  
+### 🗺️ Dynamic Spatial Intelligence
+- **Coordinate Capture:** Tracks exact Latitude and Longitude of user clicks.
+- **Reverse Geocoding:** Calls the OpenStreetMap API to identify the exact name (e.g., Nagpur, Pune, Gondia) of the clicked location.
 
-### 🌫️ Pollution (AQI) Analysis
-- Generates AQI score based on coordinates  
-- Displays risk levels (Low, Moderate, High, Severe)  
+### 🌫️ Pollution (AQI) Analysis Mode
+- **Simulated Real-Time AQI:** Generates a localized AQI score (0–500).
+- **Risk Classification:** Categories range from "Good" to "Severe" based on Indian NAAQS standards.
 
-### 🚔 Crime Density Analysis
-- Shows crime score for selected location  
-- Displays breakdown:
-  - Theft  
-  - Assault  
-  - Cybercrime  
-  - Fraud  
+### 🚔 Crime Density Analysis Mode
+- **Categorical Breakdown:** Provides a localized "Crime Index."
+- **Visualization:** Shows a multi-category breakdown including Theft, Assault, Cybercrime, and Fraud.
 
-### 🎨 Theme Toggle
-- Switch between Dark Mode and Light Mode  
-
-### 📊 Dynamic Visualization
-- Graph updates instantly when switching modes  
-- AQI → single bar chart  
-- Crime → multi-category chart  
+### 🎨 State-Dependent UI
+- **Theme Toggle:** Switch between "Dark Mode" and "Light Mode" with high-contrast CSS fixes.
+- **Mode Persistence:** Visual indicators (checked icons) show whether the user is in Pollution or Crime analysis state.
 
 ---
 
 ## 🧠 Working Principle
 
-1. User clicks on map  
-2. Latitude & Longitude are captured  
-3. OpenStreetMap API is used to fetch location name  
-4. Score is generated using a mathematical function  
-5. Risk level is calculated  
-6. Results are displayed on map and sidebar  
+1. **User Interaction:** The user selects a mode (Crime/Pollution) and clicks a point on the map.
+2. **Data Acquisition:** The app captures the coordinates and sends a GET request to the Nominatim API to retrieve the human-readable address.
+3. **Logic Processing:** A mathematical simulation engine generates a risk score based on coordinate data and the selected analysis mode.
+4. **Reactive Rendering:** The map displays a popup at the click point, and the sidebar instantly updates with a `ggplot2` chart specific to that location.
 
 ---
 
-## 🔢 Score Logic
+## 🚀 How to Run
+
+1. **Install required packages:**
+   ```r
+   install.packages(c("shiny", "leaflet", "bslib", "tidyverse", "ggplot2", "shinyWidgets", "httr"))
+   Launch the App: Open app.R in RStudio and click Run App.
+2. Launch the App: Open app.R in RStudio and click Run App.
+3. Connectivity: Ensure you have an active internet connection for the API geocoding and map tiles to function correctly.
