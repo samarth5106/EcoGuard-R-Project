@@ -9,9 +9,9 @@ library(leaflet)
 library(bslib)
 library(tidyverse)
 library(ggplot2)
+library(leafpop)
 
 # --- 1. DATA PREPARATION (Internal Dataset) ---
-# We simulate a history for each city to enable the ggplot feature
 city_data <- data.frame(
   city = c("Delhi", "Mumbai", "Bengaluru", "Pune", "Hyderabad"),
   lat = c(28.61, 19.07, 12.97, 18.52, 17.38),
@@ -23,7 +23,7 @@ city_data <- data.frame(
 # --- 2. UI (Dark Mode Layout) ---
 ui <- page_navbar(
   title = "ISEI: India Dashboard",
-  theme = bs_theme(version = 5, bootswatch = "darkly"), # Dark Mode Signature
+  theme = bs_theme(version = 5, bootswatch = "darkly"), 
   
   nav_panel("Intelligence Map",
             layout_sidebar(
@@ -32,7 +32,6 @@ ui <- page_navbar(
                 selectInput("time", "Time of Day:", choices = c("Morning", "Afternoon", "Evening", "Night")),
                 hr(),
                 helpText("The Livability Score is calculated using a weighted average of AQI and Crime Density."),
-                # Signature: Live Calculation Output
                 uiOutput("avg_stats")
               ),
               leafletOutput("map", height = "750px")
@@ -43,38 +42,46 @@ ui <- page_navbar(
 # --- 3. SERVER LOGIC ---
 server <- function(input, output, session) {
   
-  # Logic: Calculate the 'Signature' Livability Score
-  # Formula: 100 - (scaled_aqi + scaled_crime)
+  # Logic: Calculate Livability Score
   processed_data <- reactive({
     city_data %>%
-      mutate(
-        livability_score = round(100 - ((aqi/5) + (crime/2)), 1)
-      )
+      mutate(livability_score = round(100 - ((aqi/5) + (crime/2)), 1))
   })
+  
+  # Function to create a small plot for each city
+  create_plot <- function(city_name, aqi_val, crime_val) {
+    p <- ggplot(data.frame(Category=c("AQI", "Crime"), Value=c(aqi_val, crime_val)), 
+                aes(x=Category, y=Value, fill=Category)) +
+      geom_bar(stat="identity", show.legend = FALSE) +
+      theme_minimal() + 
+      labs(title = paste(city_name, "Metrics")) +
+      scale_fill_manual(values=c("#e74c3c", "#3498db"))
+    return(p)
+  }
   
   output$map <- renderLeaflet({
     df <- processed_data()
     
-    # Color palette based on Livability (Green = Good, Red = Bad)
+    # Create a list of plots for each marker
+    plot_list <- lapply(1:nrow(df), function(i) {
+      create_plot(df$city[i], df$aqi[i], df$crime[i])
+    })
+    
     pal <- colorNumeric(palette = "RdYlGn", domain = df$livability_score)
     
     leaflet(df) %>%
-      addProviderTiles(providers$CartoDB.DarkMatter) %>% # High-tech dark base
+      addProviderTiles(providers$CartoDB.DarkMatter) %>%
       setView(lng = 78.96, lat = 20.59, zoom = 5) %>%
       addCircleMarkers(
-        radius = 12,
+        radius = 15,
         color = ~pal(livability_score),
         fillOpacity = 0.8,
-        # The 'Signature' Pop-up: Simple but shows technical depth
-        popup = ~paste0(
-          "<b>City: </b>", city, "<br>",
-          "<b>Livability Score: </b>", livability_score, "/100<br>",
-          "<hr>AQI: ", aqi, "<br>Crime Index: ", crime
-        )
-      )
+        group = "cities"
+      ) %>%
+      leafpop::addPopupGraphs(plot_list, group = "cities", width = 300, height = 200)
   })
   
-  # Sidebar Stats logic
+  # Sidebar Stats logic - Corrected position inside server
   output$avg_stats <- renderUI({
     df <- processed_data()
     avg_score <- round(mean(df$livability_score), 1)
